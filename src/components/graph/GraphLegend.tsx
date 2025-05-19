@@ -3,11 +3,11 @@ import { FacilityType } from '@/types/supply-chain';
 
 const GraphLegend = () => {
   const nodeTypes = [
-    { type: FacilityType.MANUFACTURING, label: 'Manufacturing', color: '#ff8c42' },
-    { type: FacilityType.DISTRIBUTION, label: 'Distribution', color: '#0ec1eb' },
+    { type: FacilityType.MANUFACTURING, label: 'Manufacturing', color: '#F97316' },
+    { type: FacilityType.DISTRIBUTION, label: 'Distribution', color: '#33C3F0' },
     { type: FacilityType.SHOWROOM, label: 'Showroom', color: '#9b87f5' },
-    { type: FacilityType.SUPPLIER, label: 'Supplier', color: '#00ffcc' },
-    { type: FacilityType.BUYER, label: 'Buyer', color: '#e5deff' },
+    { type: FacilityType.SUPPLIER, label: 'Supplier', color: '#FFC857' },
+    { type: FacilityType.BUYER, label: 'Buyer', color: '#E07A5F' },
   ];
 
   const edgeTypes = [
@@ -26,7 +26,7 @@ const GraphLegend = () => {
           <div className="space-y-2">
             {nodeTypes.map((item) => (
               <div key={item.type} className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: item.color }}></div>
+                <div className="w-6 h-6 rounded-full" style={{ backgroundColor: item.color, border: '1px solid white' }}></div>
                 <span className="text-white text-sm">{item.label}</span>
               </div>
             ))}
@@ -38,7 +38,7 @@ const GraphLegend = () => {
           <div className="space-y-2">
             {edgeTypes.map((item) => (
               <div key={item.status} className="flex items-center gap-2">
-                <div className="w-6 h-0.5" style={{ backgroundColor: item.color }}></div>
+                <div className="w-6 h-1" style={{ backgroundColor: item.color }}></div>
                 <span className="text-white text-sm">{item.label}</span>
               </div>
             ))}

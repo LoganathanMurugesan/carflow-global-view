@@ -32,18 +32,19 @@ interface GraphEdge {
   };
 }
 
+// New, more vibrant color scheme inspired by the image
 const getNodeColor = (facilityType: FacilityType): string => {
   switch (facilityType) {
     case FacilityType.MANUFACTURING:
-      return '#ff8c42';
+      return '#F97316'; // Bright orange from image
     case FacilityType.DISTRIBUTION:
-      return '#0ec1eb';
+      return '#33C3F0'; // Vibrant sky blue from image
     case FacilityType.SHOWROOM:
-      return '#9b87f5';
+      return '#9b87f5'; // Purple
     case FacilityType.SUPPLIER:
-      return '#00ffcc';
+      return '#FFC857'; // Yellow
     case FacilityType.BUYER:
-      return '#e5deff';
+      return '#E07A5F'; // Coral
     default:
       return '#ffffff';
   }
@@ -89,17 +90,17 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
     filteredNodeIds.has(edge.data.source) && filteredNodeIds.has(edge.data.target)
   );
 
-  // Cytoscape layout options
+  // Improved layout options for better visualization
   const layout = {
     name: 'cose',
-    idealEdgeLength: 100,
+    idealEdgeLength: 120,
     nodeOverlap: 20,
     refresh: 20,
     fit: true,
-    padding: 30,
+    padding: 50,
     randomize: false,
-    componentSpacing: 100,
-    nodeRepulsion: 400000,
+    componentSpacing: 120,
+    nodeRepulsion: 450000,
     edgeElasticity: 100,
     nestingFactor: 5,
     gravity: 80,
@@ -109,7 +110,7 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
     minTemp: 1.0
   };
 
-  // Cytoscape stylesheet
+  // Enhanced stylesheet for better visualization
   const stylesheet = [
     {
       selector: 'node',
@@ -119,15 +120,17 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
         'color': '#ffffff',
         'text-outline-color': '#0b1420',
         'text-outline-width': 1,
-        'font-size': 10,
-        'width': 40,
-        'height': 40,
+        'font-size': 11,
         'text-valign': 'center',
+        'text-halign': 'center',
         'text-wrap': 'wrap',
-        'text-max-width': '80px',
-        'border-color': '#0ec1eb',
-        'border-width': (ele: any) => ele.id() === selectedNode ? 3 : 0,
-        'border-opacity': 0.8
+        'text-max-width': '100px',
+        'width': 80,
+        'height': 80,
+        'border-color': '#ffffff',
+        'border-width': (ele: any) => ele.id() === selectedNode ? 3 : 1,
+        'border-opacity': (ele: any) => ele.id() === selectedNode ? 1 : 0.5,
+        'text-margin-y': 0
       }
     },
     {
@@ -143,7 +146,7 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
             case 'scheduled':
               return '#0ec1eb';
             default:
-              return '#ffffff';
+              return '#8E9196'; // Light gray color from image
           }
         },
         'target-arrow-color': (ele: any) => {
@@ -155,21 +158,29 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
             case 'scheduled':
               return '#0ec1eb';
             default:
-              return '#ffffff';
+              return '#8E9196';
           }
         },
         'target-arrow-shape': 'triangle',
         'curve-style': 'bezier',
         'label': 'data(label)',
-        'font-size': 8,
+        'font-size': 10,
         'color': '#e5deff',
         'text-outline-color': '#0b1420',
         'text-outline-width': 2,
         'text-background-opacity': 0.7,
         'text-background-color': '#0b1420',
-        'text-background-padding': 2,
+        'text-background-padding': 3,
         'text-wrap': 'wrap',
-        'text-max-width': '120px'
+        'text-max-width': '120px',
+        'edge-text-rotation': 'autorotate',
+        'text-rotation': 'none',
+        'arrow-scale': 1.5,
+        'target-distance-from-node': 5,
+        // Position text away from the edge line to avoid intersection
+        'text-margin-y': -10,
+        'source-endpoint': 'outside-to-node',
+        'target-endpoint': 'outside-to-node'
       }
     },
     {
@@ -177,7 +188,13 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
       style: {
         'border-color': '#ffffff',
         'border-width': 3,
-        'border-opacity': 1
+        'border-opacity': 1,
+        'background-opacity': 0.9,
+        'shadow-blur': 10,
+        'shadow-color': '#ffffff',
+        'shadow-opacity': 0.5,
+        'shadow-offset-x': 0,
+        'shadow-offset-y': 0
       }
     }
   ];
@@ -187,10 +204,9 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
       const node = cyRef.current.getElementById(selectedNode);
       if (node.length > 0) {
         const position = node.renderedPosition();
-        const zoom = cyRef.current.zoom();
         
         setPanelPosition({
-          x: position.x + 50,
+          x: position.x + 100,
           y: position.y - 50
         });
       }
@@ -217,7 +233,7 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
       
       const position = node.renderedPosition();
       setPanelPosition({
-        x: position.x + 50,
+        x: position.x + 100,
         y: position.y - 50
       });
     });
