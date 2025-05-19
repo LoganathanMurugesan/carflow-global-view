@@ -111,9 +111,14 @@ const SupplyChainMap = ({
               const markerLngLat = [facility.longitude, facility.latitude];
               const markerPoint = map.current.project(markerLngLat);
               
+              // Get marker element position relative to viewport
+              const markerElement = markersRef.current[facility.id].getElement();
+              const markerRect = markerElement.getBoundingClientRect();
+              
+              // Set position based on the actual DOM element
               setSelectedMarkerPosition({
-                x: markerPoint.x,
-                y: markerPoint.y
+                x: markerRect.left + markerRect.width / 2,
+                y: markerRect.top + markerRect.height / 2
               });
               
               onSelectFacility(facility);
