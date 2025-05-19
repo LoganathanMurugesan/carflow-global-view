@@ -36,14 +36,14 @@ const FacilityPopup = ({ facility, onClose, mapPosition }: FacilityPopupProps) =
     // Default positions
     let top = mapPosition.y;
     let left = mapPosition.x + bufferSpace;
-    let right = 'auto';
-    let bottom = 'auto';
+    let right: number | 'auto' = 'auto';
+    let bottom: number | 'auto' = 'auto';
     let transform = 'none';
     let arrowClass = 'left-[-8px] top-5 border-r-[#0b1420]/95 border-r-8 border-y-transparent border-y-8 border-l-0';
     
     // If popup would go off right edge of screen, position it to the left of marker
     if (mapPosition.x + 320 > windowWidth) { // 320 = approximate popup width
-      left = 'auto';
+      left = 'auto' as unknown as number;
       right = windowWidth - mapPosition.x + bufferSpace;
       arrowClass = 'right-[-8px] top-5 border-l-[#0b1420]/95 border-l-8 border-y-transparent border-y-8 border-r-0';
     }
@@ -68,10 +68,10 @@ const FacilityPopup = ({ facility, onClose, mapPosition }: FacilityPopupProps) =
       ref={popupRef}
       className="fixed z-50 w-80 bg-[#0b1420]/95 border border-[#0ec1eb]/30 rounded-md shadow-[0_0_20px_rgba(14,193,235,0.15)] backdrop-blur-sm"
       style={{ 
-        top: typeof top === 'number' ? `${top}px` : top, 
-        left: typeof left === 'number' ? `${left}px` : left,
-        right: right,
-        bottom: bottom,
+        top: `${top}px`, 
+        left: left === 'auto' ? 'auto' : `${left}px`,
+        right: right === 'auto' ? 'auto' : `${right}px`,
+        bottom: bottom === 'auto' ? 'auto' : `${bottom}px`,
         transform: transform,
         maxHeight: 'calc(100vh - 8rem)'
       }}

@@ -108,7 +108,7 @@ const SupplyChainMap = ({
           onClick={() => {
             // Get pixel coordinates of the marker
             if (map.current) {
-              const markerLngLat = [facility.longitude, facility.latitude];
+              const markerLngLat: [number, number] = [facility.longitude, facility.latitude];
               const markerPoint = map.current.project(markerLngLat);
               
               // Get marker element position relative to viewport
