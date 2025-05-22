@@ -1,0 +1,327 @@
+
+{
+  "facilities": [
+    {
+      "id": "mf1",
+      "name": "Chennai Central Manufacturing",
+      "type": "MANUFACTURING",
+      "latitude": 13.0827,
+      "longitude": 80.2707,
+      "details": {
+        "address": "Anna Salai, Chennai, Tamil Nadu 600002, India",
+        "capacity": 180000,
+        "inventory": 15600,
+        "manager": "Raj Sharma",
+        "established": "1998-06-15",
+        "specialization": "Aircraft Manufacturing"
+      }
+    },
+    {
+      "id": "mf2",
+      "name": "Ambattur Industrial Estate",
+      "type": "MANUFACTURING",
+      "latitude": 13.1143,
+      "longitude": 80.1548,
+      "details": {
+        "address": "Ambattur Industrial Estate, Chennai 600058, India",
+        "capacity": 250000,
+        "inventory": 22800,
+        "manager": "Priya Patel",
+        "established": "2002-11-23",
+        "specialization": "Engine Assembly"
+      }
+    },
+    {
+      "id": "mf3",
+      "name": "Bengaluru Assembly Plant",
+      "type": "MANUFACTURING",
+      "latitude": 12.9716,
+      "longitude": 77.5946,
+      "details": {
+        "address": "Electronic City, Bangalore 560100, India",
+        "capacity": 320000,
+        "inventory": 28400,
+        "manager": "Vikram Singh",
+        "established": "2005-03-12",
+        "specialization": "Aircraft Interior Assembly"
+      }
+    },
+    {
+      "id": "dc1",
+      "name": "Delhi Distribution Center",
+      "type": "DISTRIBUTION",
+      "latitude": 28.5355,
+      "longitude": 77.2510,
+      "details": {
+        "address": "IGI Airport Area, New Delhi 110037, India",
+        "capacity": 35000,
+        "inventory": 7800,
+        "manager": "Anand Kumar",
+        "established": "2006-08-12"
+      }
+    },
+    {
+      "id": "dc2",
+      "name": "Mumbai Logistics Hub",
+      "type": "DISTRIBUTION",
+      "latitude": 19.0896,
+      "longitude": 72.8656,
+      "details": {
+        "address": "Santacruz Airport Area, Mumbai 400029, India",
+        "capacity": 28000,
+        "inventory": 9200,
+        "manager": "Deepa Venkatesh",
+        "established": "2014-03-18"
+      }
+    },
+    {
+      "id": "dc3",
+      "name": "Kolkata Distribution",
+      "type": "DISTRIBUTION",
+      "latitude": 22.6520,
+      "longitude": 88.4463,
+      "details": {
+        "address": "Netaji Subhash Chandra Bose Airport, Kolkata 700052, India",
+        "capacity": 42000,
+        "inventory": 12800,
+        "manager": "Suresh Rao",
+        "established": "2010-07-22"
+      }
+    },
+    {
+      "id": "ar1",
+      "name": "Chennai International Airport",
+      "type": "SHOWROOM",
+      "latitude": 12.9941,
+      "longitude": 80.1709,
+      "details": {
+        "address": "GST Road, Meenambakkam, Chennai 600027, India",
+        "inventory": 85,
+        "manager": "Lakshmi Narayan",
+        "established": "2010-04-30"
+      }
+    },
+    {
+      "id": "ar2",
+      "name": "Indira Gandhi International Airport",
+      "type": "SHOWROOM",
+      "latitude": 28.5562,
+      "longitude": 77.1000,
+      "details": {
+        "address": "Terminal 3, IGI Airport, New Delhi 110037, India",
+        "inventory": 65,
+        "manager": "Vimal Krishnan",
+        "established": "2016-09-14"
+      }
+    },
+    {
+      "id": "ar3",
+      "name": "Kempegowda International Airport",
+      "type": "SHOWROOM",
+      "latitude": 13.1986,
+      "longitude": 77.7066,
+      "details": {
+        "address": "Devanahalli, Bangalore 560300, India",
+        "inventory": 92,
+        "manager": "Arjun Reddy",
+        "established": "2015-05-22"
+      }
+    },
+    {
+      "id": "sp1",
+      "name": "Hyderabad Electronics Supplier",
+      "type": "SUPPLIER",
+      "latitude": 17.4123,
+      "longitude": 78.4092,
+      "details": {
+        "address": "HITEC City, Hyderabad 500081, India",
+        "capacity": 420000,
+        "manager": "Harish Reddy",
+        "established": "2008-07-15",
+        "specialization": "Avionics Components"
+      }
+    },
+    {
+      "id": "sp2",
+      "name": "Pune Mechanical Components",
+      "type": "SUPPLIER",
+      "latitude": 18.5204,
+      "longitude": 73.8567,
+      "details": {
+        "address": "MIDC Industrial Area, Pune 411045, India",
+        "capacity": 280000,
+        "manager": "Meena Kumari",
+        "established": "2007-11-30",
+        "specialization": "Precision Mechanical Parts"
+      }
+    },
+    {
+      "id": "sp3",
+      "name": "Coimbatore Textile & Upholstery",
+      "type": "SUPPLIER",
+      "latitude": 11.0168,
+      "longitude": 76.9558,
+      "details": {
+        "address": "SIDCO Industrial Estate, Coimbatore 641021, India",
+        "capacity": 180000,
+        "manager": "Rajesh Kumar",
+        "established": "2012-04-18",
+        "specialization": "Interior Fabrics & Upholstery"
+      }
+    },
+    {
+      "id": "al1",
+      "name": "Air India",
+      "type": "BUYER",
+      "latitude": 19.0896,
+      "longitude": 72.8656,
+      "details": {
+        "address": "Airlines House, 113 Gurudwara Rakabganj Road, New Delhi 110001, India",
+        "manager": "Vikram Mehta",
+        "established": "1932-10-15"
+      }
+    },
+    {
+      "id": "al2",
+      "name": "IndiGo Airlines",
+      "type": "BUYER",
+      "latitude": 28.5562,
+      "longitude": 77.1000,
+      "details": {
+        "address": "Level 1, Tower C, Global Business Park, Gurgaon 122002, India",
+        "manager": "Sanjay Gupta",
+        "established": "2006-08-11"
+      }
+    },
+    {
+      "id": "al3",
+      "name": "SpiceJet",
+      "type": "BUYER",
+      "latitude": 28.5508,
+      "longitude": 77.0746,
+      "details": {
+        "address": "319 Udyog Vihar, Phase IV, Gurgaon 122016, India",
+        "manager": "Kiran Reddy",
+        "established": "2005-05-23"
+      }
+    }
+  ],
+  "movements": [
+    {
+      "id": "vm1",
+      "sourceFacilityId": "mf1",
+      "destinationFacilityId": "dc1",
+      "vehicleType": "Cargo Plane",
+      "status": "in-transit",
+      "departureTime": "2025-05-15T08:30:00Z",
+      "arrivalTime": "2025-05-15T10:00:00Z",
+      "cargo": "Aircraft Fuselage (2 units)"
+    },
+    {
+      "id": "vm2",
+      "sourceFacilityId": "mf2",
+      "destinationFacilityId": "dc2",
+      "vehicleType": "Transport Aircraft",
+      "status": "completed",
+      "departureTime": "2025-05-14T06:15:00Z",
+      "arrivalTime": "2025-05-14T08:45:00Z",
+      "cargo": "Aircraft Engines (8 units)"
+    },
+    {
+      "id": "vm3",
+      "sourceFacilityId": "mf3",
+      "destinationFacilityId": "dc3",
+      "vehicleType": "Cargo Plane",
+      "status": "scheduled",
+      "departureTime": "2025-05-17T07:00:00Z",
+      "cargo": "Cabin Interiors (12 sets)"
+    },
+    {
+      "id": "vm4",
+      "sourceFacilityId": "sp1",
+      "destinationFacilityId": "mf1",
+      "vehicleType": "Supply Transport",
+      "status": "in-transit",
+      "departureTime": "2025-05-15T12:40:00Z",
+      "arrivalTime": "2025-05-15T14:20:00Z",
+      "cargo": "Avionics Systems (35 units)"
+    },
+    {
+      "id": "vm5",
+      "sourceFacilityId": "sp2",
+      "destinationFacilityId": "mf2",
+      "vehicleType": "Cargo Transport",
+      "status": "completed",
+      "departureTime": "2025-05-14T09:20:00Z",
+      "arrivalTime": "2025-05-14T11:45:00Z",
+      "cargo": "Engine Parts (250 units)"
+    },
+    {
+      "id": "vm6",
+      "sourceFacilityId": "sp3",
+      "destinationFacilityId": "mf3",
+      "vehicleType": "Supply Truck",
+      "status": "scheduled",
+      "departureTime": "2025-05-16T08:00:00Z",
+      "cargo": "Interior Materials (85 units)"
+    },
+    {
+      "id": "vm7",
+      "sourceFacilityId": "dc1",
+      "destinationFacilityId": "ar1",
+      "vehicleType": "Transport Plane",
+      "status": "in-transit",
+      "departureTime": "2025-05-15T13:15:00Z",
+      "arrivalTime": "2025-05-15T15:45:00Z",
+      "cargo": "Completed Aircraft (1 unit)"
+    },
+    {
+      "id": "vm8",
+      "sourceFacilityId": "dc2",
+      "destinationFacilityId": "ar2",
+      "vehicleType": "Transport Plane",
+      "status": "completed",
+      "departureTime": "2025-05-13T09:45:00Z",
+      "arrivalTime": "2025-05-13T14:30:00Z",
+      "cargo": "Completed Aircraft (1 unit)"
+    },
+    {
+      "id": "vm9",
+      "sourceFacilityId": "dc3",
+      "destinationFacilityId": "ar3",
+      "vehicleType": "Transport Plane",
+      "status": "scheduled",
+      "departureTime": "2025-05-18T07:00:00Z",
+      "cargo": "Completed Aircraft (1 unit)"
+    },
+    {
+      "id": "vm10",
+      "sourceFacilityId": "mf1",
+      "destinationFacilityId": "al1",
+      "vehicleType": "Delivery Flight",
+      "status": "completed",
+      "departureTime": "2025-05-12T14:30:00Z",
+      "arrivalTime": "2025-05-12T17:00:00Z",
+      "cargo": "Commercial Aircraft (1 unit)"
+    },
+    {
+      "id": "vm11",
+      "sourceFacilityId": "mf2",
+      "destinationFacilityId": "al2",
+      "vehicleType": "Delivery Flight",
+      "status": "in-transit",
+      "departureTime": "2025-05-15T08:00:00Z",
+      "arrivalTime": "2025-05-16T10:00:00Z",
+      "cargo": "Commercial Aircraft (2 units)"
+    },
+    {
+      "id": "vm12",
+      "sourceFacilityId": "mf3",
+      "destinationFacilityId": "al3",
+      "vehicleType": "Delivery Flight",
+      "status": "scheduled",
+      "departureTime": "2025-05-19T06:30:00Z",
+      "cargo": "Commercial Aircraft (1 unit)"
+    }
+  ]
+}
