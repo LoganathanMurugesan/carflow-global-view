@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
 import Cytoscape from 'cytoscape';
@@ -8,6 +7,7 @@ import NodeDetailsPanel from './NodeDetailsPanel';
 import { Button } from '@/components/ui/button';
 import { LayoutGrid, Maximize2, Minimize2, ZoomIn, ZoomOut } from 'lucide-react';
 import { toast } from 'sonner';
+import LayoutController from './LayoutController';
 
 // Import layout extensions
 import cola from 'cytoscape-cola';
@@ -453,25 +453,13 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
 
   return (
     <div id="graph-container" className="w-full h-[calc(100vh-220px)] relative">
-      {/* Layout controls */}
-      <div className="absolute top-2 left-2 z-10 bg-[#0b1420]/90 border border-[#0ec1eb]/30 rounded-md p-2">
-        <div className="flex items-center mb-2">
-          <LayoutGrid className="w-4 h-4 text-[#0ec1eb] mr-2" />
-          <span className="text-xs text-[#0ec1eb] font-medium">Layouts</span>
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          {Object.keys(LAYOUTS).map((layout) => (
-            <Button
-              key={layout}
-              size="sm"
-              variant="outline"
-              className={`text-xs py-1 px-2 h-auto ${currentLayout === layout ? 'bg-[#0ec1eb]/20 border-[#0ec1eb]' : 'bg-[#121a2b] border-[#0ec1eb]/30'}`}
-              onClick={() => setCurrentLayout(layout)}
-            >
-              {layout.charAt(0).toUpperCase() + layout.slice(1)}
-            </Button>
-          ))}
-        </div>
+      {/* Layout controls using LayoutController */}
+      <div className="absolute top-2 left-2 z-10">
+        <LayoutController 
+          currentLayout={currentLayout}
+          onLayoutChange={setCurrentLayout}
+          availableLayouts={Object.keys(LAYOUTS)}
+        />
       </div>
       
       {/* Fullscreen toggle */}
