@@ -12,14 +12,24 @@ export const facilityData: Facility[] = airwaysData.facilities.map(facility => (
   details: facility.details
 }));
 
-// Map the JSON movement data to our TypeScript types
-export const vehicleMovements: VehicleMovement[] = airwaysData.movements.map(movement => ({
-  id: movement.id,
-  sourceFacilityId: movement.sourceFacilityId,
-  destinationFacilityId: movement.destinationFacilityId,
-  vehicleType: movement.vehicleType,
-  status: movement.status,
-  departureTime: movement.departureTime,
-  arrivalTime: movement.arrivalTime,
-  cargo: movement.cargo
-}));
+// Type guard function to validate status values
+const isValidStatus = (status: string): status is 'in-transit' | 'completed' | 'scheduled' => {
+  return status === 'in-transit' || status === 'completed' || status === 'scheduled';
+};
+
+// Map the JSON movement data to our TypeScript types with status validation
+export const vehicleMovements: VehicleMovement[] = airwaysData.movements.map(movement => {
+  // Check if the status is valid, otherwise default to 'scheduled'
+  const status = isValidStatus(movement.status) ? movement.status : 'scheduled';
+  
+  return {
+    id: movement.id,
+    sourceFacilityId: movement.sourceFacilityId,
+    destinationFacilityId: movement.destinationFacilityId,
+    vehicleType: movement.vehicleType,
+    status: status,
+    departureTime: movement.departureTime,
+    arrivalTime: movement.arrivalTime,
+    cargo: movement.cargo
+  };
+});
