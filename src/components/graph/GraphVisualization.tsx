@@ -1,25 +1,13 @@
+
 import { useEffect, useRef, useState } from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
-import Cytoscape from 'cytoscape';
 import { facilityData, vehicleMovements } from '@/data/mockData';
 import { FacilityType } from '@/types/supply-chain';
 import NodeDetailsPanel from './NodeDetailsPanel';
 import { Button } from '@/components/ui/button';
-import { LayoutGrid, Maximize2, Minimize2, ZoomIn, ZoomOut } from 'lucide-react';
+import { Maximize2, Minimize2, ZoomIn, ZoomOut } from 'lucide-react';
 import { toast } from 'sonner';
 import LayoutController from './LayoutController';
-
-// Import layout extensions
-import cola from 'cytoscape-cola';
-import dagre from 'cytoscape-dagre';
-import klay from 'cytoscape-klay';
-import cise from 'cytoscape-cise';
-
-// Register extensions
-Cytoscape.use(cola);
-Cytoscape.use(dagre);
-Cytoscape.use(klay);
-Cytoscape.use(cise);
 
 interface GraphVisualizationProps {
   searchQuery: string;
@@ -84,42 +72,6 @@ const LAYOUTS = {
     coolingFactor: 0.95,
     minTemp: 1.0
   },
-  cola: {
-    name: 'cola',
-    animate: true,
-    refresh: 1,
-    maxSimulationTime: 4000,
-    fit: true,
-    padding: 30,
-    nodeDimensionsIncludeLabels: false,
-    convergenceThreshold: 0.01
-  },
-  dagre: {
-    name: 'dagre',
-    rankDir: 'TB',
-    ranker: 'tight-tree',
-    nodeSep: 50,
-    rankSep: 100,
-    padding: 10,
-    spacingFactor: 1.2
-  },
-  klay: {
-    name: 'klay',
-    nodeDimensionsIncludeLabels: true,
-    fit: true,
-    padding: 20,
-    klay: {
-      spacing: 40,
-      direction: 'DOWN'
-    }
-  },
-  cise: {
-    name: 'cise',
-    fit: true,
-    padding: 30,
-    clusters: [],
-    randomize: true
-  },
   breadthfirst: {
     name: 'breadthfirst',
     directed: true,
@@ -137,11 +89,30 @@ const LAYOUTS = {
     clockwise: true,
     equidistant: false,
     minNodeSpacing: 50
+  },
+  grid: {
+    name: 'grid',
+    fit: true,
+    padding: 30,
+    avoidOverlap: true,
+    rows: undefined,
+    columns: undefined
+  },
+  random: {
+    name: 'random',
+    fit: true
+  },
+  circle: {
+    name: 'circle',
+    fit: true,
+    padding: 30,
+    radius: undefined,
+    startAngle: 3/2 * Math.PI
   }
 };
 
 const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel }: GraphVisualizationProps) => {
-  const cyRef = useRef<Cytoscape.Core | null>(null);
+  const cyRef = useRef<any>(null);
   const [nodeDetails, setNodeDetails] = useState<any>(null);
   const [panelPosition, setPanelPosition] = useState({ x: 0, y: 0 });
   const [currentLayout, setCurrentLayout] = useState<string>('cose');
@@ -397,11 +368,11 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
   };
 
   // Handle Cytoscape instance creation
-  const handleCytoscapeRef = (cy: Cytoscape.Core) => {
+  const handleCytoscapeRef = (cy: any) => {
     cyRef.current = cy;
     
     // Register node click event
-    cy.on('tap', 'node', (event) => {
+    cy.on('tap', 'node', (event: any) => {
       const node = event.target;
       onNodeSelect(node.id());
       setNodeDetails(node.data('details'));
@@ -414,7 +385,7 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
     });
     
     // Register background click event
-    cy.on('tap', (event) => {
+    cy.on('tap', (event: any) => {
       if (event.target === cy) {
         onNodeSelect('');
         setNodeDetails(null);
@@ -424,7 +395,7 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
     });
 
     // Register right click for context menu
-    cy.on('cxttap', 'node', (event) => {
+    cy.on('cxttap', 'node', (event: any) => {
       const node = event.target;
       const position = event.renderedPosition;
       setContextMenuPosition({
