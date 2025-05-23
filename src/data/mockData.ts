@@ -1,9 +1,9 @@
 
 import { Facility, FacilityType, VehicleMovement } from '../types/supply-chain';
-import recordsData from './records.json';
+import airwaysData from './Airways.json';
 
 // Map the JSON facility data to our TypeScript types
-export const facilityData: Facility[] = recordsData.facilities.map(facility => ({
+export const facilityData: Facility[] = airwaysData.facilities.map(facility => ({
   id: facility.id,
   name: facility.name,
   type: facility.type as FacilityType,
@@ -18,7 +18,7 @@ const isValidStatus = (status: string): status is 'in-transit' | 'completed' | '
 };
 
 // Map the JSON movement data to our TypeScript types with status validation
-export const vehicleMovements: VehicleMovement[] = recordsData.movements.map(movement => {
+export const vehicleMovements: VehicleMovement[] = airwaysData.movements.map(movement => {
   // Check if the status is valid, otherwise default to 'scheduled'
   const status = isValidStatus(movement.status) ? movement.status : 'scheduled';
   
