@@ -1,0 +1,114 @@
+
+{
+  "facilities": [
+    {
+      "id": "rec1",
+      "name": "Central Manufacturing Hub",
+      "type": "MANUFACTURING",
+      "latitude": 40.7128,
+      "longitude": -74.0060,
+      "details": {
+        "address": "123 Industrial Ave, New York, NY 10001",
+        "capacity": 500000,
+        "inventory": 45000,
+        "manager": "John Smith",
+        "established": "2010-01-15",
+        "specialization": "Primary Manufacturing"
+      }
+    },
+    {
+      "id": "rec2",
+      "name": "West Coast Distribution",
+      "type": "DISTRIBUTION",
+      "latitude": 34.0522,
+      "longitude": -118.2437,
+      "details": {
+        "address": "456 Logistics Blvd, Los Angeles, CA 90001",
+        "capacity": 150000,
+        "inventory": 12000,
+        "manager": "Sarah Johnson",
+        "established": "2015-03-20"
+      }
+    },
+    {
+      "id": "rec3",
+      "name": "Premium Showroom",
+      "type": "SHOWROOM",
+      "latitude": 41.8781,
+      "longitude": -87.6298,
+      "details": {
+        "address": "789 Display St, Chicago, IL 60601",
+        "inventory": 150,
+        "manager": "Mike Davis",
+        "established": "2018-06-10"
+      }
+    },
+    {
+      "id": "rec4",
+      "name": "Component Supplier Co",
+      "type": "SUPPLIER",
+      "latitude": 32.7767,
+      "longitude": -96.7970,
+      "details": {
+        "address": "321 Supply Chain Dr, Dallas, TX 75201",
+        "capacity": 300000,
+        "manager": "Lisa Wilson",
+        "established": "2012-09-05",
+        "specialization": "Electronic Components"
+      }
+    },
+    {
+      "id": "rec5",
+      "name": "Enterprise Buyer Corp",
+      "type": "BUYER",
+      "latitude": 39.9526,
+      "longitude": -75.1652,
+      "details": {
+        "address": "654 Commerce Way, Philadelphia, PA 19101",
+        "manager": "Robert Brown",
+        "established": "2008-11-30"
+      }
+    }
+  ],
+  "movements": [
+    {
+      "id": "mov1",
+      "sourceFacilityId": "rec1",
+      "destinationFacilityId": "rec2",
+      "vehicleType": "Freight Truck",
+      "status": "in-transit",
+      "departureTime": "2025-05-20T08:00:00Z",
+      "arrivalTime": "2025-05-21T14:00:00Z",
+      "cargo": "Manufactured Goods (500 units)"
+    },
+    {
+      "id": "mov2",
+      "sourceFacilityId": "rec4",
+      "destinationFacilityId": "rec1",
+      "vehicleType": "Supply Transport",
+      "status": "completed",
+      "departureTime": "2025-05-19T10:30:00Z",
+      "arrivalTime": "2025-05-19T18:45:00Z",
+      "cargo": "Electronic Components (1000 units)"
+    },
+    {
+      "id": "mov3",
+      "sourceFacilityId": "rec2",
+      "destinationFacilityId": "rec3",
+      "vehicleType": "Delivery Van",
+      "status": "scheduled",
+      "departureTime": "2025-05-22T09:00:00Z",
+      "cargo": "Display Items (25 units)"
+    },
+    {
+      "id": "mov4",
+      "sourceFacilityId": "rec3",
+      "destinationFacilityId": "rec5",
+      "vehicleType": "Express Delivery",
+      "status": "in-transit",
+      "departureTime": "2025-05-21T12:00:00Z",
+      "arrivalTime": "2025-05-21T16:30:00Z",
+      "cargo": "Premium Products (10 units)"
+    }
+  ]
+}
