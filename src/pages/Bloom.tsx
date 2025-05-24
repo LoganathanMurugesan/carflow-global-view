@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import GraphVisualization from '../components/graph/GraphVisualization';
@@ -28,7 +27,7 @@ const Bloom = () => {
   });
   
   useEffect(() => {
-    // Calculate statistics for the graph
+    // Calculate statistics for the graph based on Airways.json data
     const nodeTypeCounts = new Map<FacilityType, number>();
     
     facilityData.forEach(facility => {
@@ -40,6 +39,12 @@ const Bloom = () => {
       nodes: facilityData.length,
       edges: vehicleMovements.length,
       nodeTypes: nodeTypeCounts
+    });
+    
+    console.log('Airways.json data loaded:', {
+      facilities: facilityData.length,
+      movements: vehicleMovements.length,
+      nodeTypes: Object.fromEntries(nodeTypeCounts)
     });
   }, []);
   
@@ -110,9 +115,9 @@ const Bloom = () => {
                         </SheetTrigger>
                         <SheetContent className="bg-[#0b1420] border-l border-[#0ec1eb]/30 text-white">
                           <SheetHeader>
-                            <SheetTitle className="text-[#0ec1eb]">Graph Insights</SheetTitle>
+                            <SheetTitle className="text-[#0ec1eb]">Airways Data Insights</SheetTitle>
                             <SheetDescription className="text-[#e1e1e6]">
-                              Analysis and statistics about the current graph view.
+                              Analysis and statistics about the Airways supply chain network.
                             </SheetDescription>
                           </SheetHeader>
                           <div className="mt-6 space-y-6">
@@ -120,17 +125,17 @@ const Bloom = () => {
                               <h3 className="text-sm font-medium text-[#0ec1eb]">Overview</h3>
                               <div className="grid grid-cols-2 gap-4">
                                 <div className="bg-[#121a2b] p-4 rounded-md border border-[#0ec1eb]/30">
-                                  <div className="text-xs text-[#0ec1eb]/70">Nodes</div>
+                                  <div className="text-xs text-[#0ec1eb]/70">Facilities</div>
                                   <div className="text-xl font-bold text-[#00ffcc]">{graphStats.nodes}</div>
                                 </div>
                                 <div className="bg-[#121a2b] p-4 rounded-md border border-[#0ec1eb]/30">
-                                  <div className="text-xs text-[#0ec1eb]/70">Connections</div>
+                                  <div className="text-xs text-[#0ec1eb]/70">Movements</div>
                                   <div className="text-xl font-bold text-[#00ffcc]">{graphStats.edges}</div>
                                 </div>
                               </div>
                             </div>
                             <div className="space-y-4">
-                              <h3 className="text-sm font-medium text-[#0ec1eb]">Node Types</h3>
+                              <h3 className="text-sm font-medium text-[#0ec1eb]">Facility Types</h3>
                               <div className="space-y-2">
                                 {Array.from(graphStats.nodeTypes.entries()).map(([type, count]) => (
                                   <div key={type} className="flex items-center justify-between">
@@ -148,7 +153,7 @@ const Bloom = () => {
                             </div>
                             {selectedNode && (
                               <div className="space-y-4">
-                                <h3 className="text-sm font-medium text-[#0ec1eb]">Selected Node</h3>
+                                <h3 className="text-sm font-medium text-[#0ec1eb]">Selected Facility</h3>
                                 <div className="bg-[#121a2b] p-4 rounded-md border border-[#0ec1eb]/30">
                                   <div className="text-xs text-[#0ec1eb]/70">ID</div>
                                   <div className="text-sm font-medium">{selectedNode}</div>
@@ -184,16 +189,24 @@ const Bloom = () => {
               </TabsContent>
               <TabsContent value="data" className="border-none">
                 <div className="bg-[#0b1420] p-4 rounded-md border border-[#0ec1eb]/30 h-[calc(100vh-220px)] overflow-auto">
-                  <h3 className="text-[#0ec1eb] mb-4">Supply Chain Data</h3>
+                  <h3 className="text-[#0ec1eb] mb-4">Airways Supply Chain Data</h3>
                   <pre className="text-white text-sm whitespace-pre-wrap">
                     {JSON.stringify(
                       { 
-                        nodes: facilityData.map(f => ({ id: f.id, type: f.type, name: f.name })),
-                        edges: vehicleMovements.map(m => ({
+                        facilities: facilityData.map(f => ({ 
+                          id: f.id, 
+                          type: f.type, 
+                          name: f.name,
+                          location: `${f.latitude}, ${f.longitude}`,
+                          details: f.details
+                        })),
+                        movements: vehicleMovements.map(m => ({
                           id: m.id,
                           source: m.sourceFacilityId,
                           target: m.destinationFacilityId,
-                          status: m.status
+                          status: m.status,
+                          vehicle: m.vehicleType,
+                          cargo: m.cargo
                         }))
                       }, 
                       null, 2
@@ -209,7 +222,7 @@ const Bloom = () => {
   );
 };
 
-// Helper function to get color for node types
+// Helper function to get color for node types based on Airways.json data
 const getNodeTypeColor = (facilityType: FacilityType): string => {
   switch (facilityType) {
     case FacilityType.MANUFACTURING:

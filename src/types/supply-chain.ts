@@ -1,10 +1,9 @@
-
 export enum FacilityType {
-  MANUFACTURING = 'manufacturing',
-  DISTRIBUTION = 'distribution',
-  SHOWROOM = 'showroom',
-  SUPPLIER = 'supplier',
-  BUYER = 'buyer'
+  MANUFACTURING = 'MANUFACTURING',
+  DISTRIBUTION = 'DISTRIBUTION',
+  SHOWROOM = 'SHOWROOM',
+  SUPPLIER = 'SUPPLIER',
+  BUYER = 'BUYER'
 }
 
 export interface Facility {
