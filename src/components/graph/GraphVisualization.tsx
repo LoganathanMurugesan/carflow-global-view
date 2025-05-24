@@ -2,12 +2,17 @@
 import { useEffect, useRef, useState } from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
 import { facilityData, vehicleMovements } from '@/data/mockData';
-import { FacilityType } from '@/types/supply-chain';
 import NodeDetailsPanel from './NodeDetailsPanel';
 import { Button } from '@/components/ui/button';
-import { Maximize2, Minimize2, ZoomIn, ZoomOut } from 'lucide-react';
+import { Maximize2, Minimize2 } from 'lucide-react';
 import { toast } from 'sonner';
 import LayoutController from './LayoutController';
+import { 
+  transformAirwaysDataToCytoscape, 
+  filterCytoscapeElements,
+  CytoscapeNode,
+  CytoscapeEdge
+} from '@/utils/cytoscapeDataTransform';
 
 interface GraphVisualizationProps {
   searchQuery: string;
@@ -16,98 +21,52 @@ interface GraphVisualizationProps {
   zoomLevel: number;
 }
 
-interface GraphNode {
-  data: {
-    id: string;
-    label: string;
-    type: string;
-    details?: any;
-  };
-}
-
-interface GraphEdge {
-  data: {
-    id: string;
-    source: string;
-    target: string;
-    label: string;
-    status?: string;
-  };
-}
-
-// Color scheme for node types
-const getNodeColor = (facilityType: FacilityType): string => {
-  switch (facilityType) {
-    case FacilityType.MANUFACTURING:
-      return '#F97316'; // Bright orange
-    case FacilityType.DISTRIBUTION:
-      return '#33C3F0'; // Vibrant sky blue
-    case FacilityType.SHOWROOM:
-      return '#9b87f5'; // Purple
-    case FacilityType.SUPPLIER:
-      return '#FFC857'; // Yellow
-    case FacilityType.BUYER:
-      return '#E07A5F'; // Coral
-    default:
-      return '#ffffff';
-  }
-};
-
+// Enhanced layout configurations optimized for Airways data
 const LAYOUTS = {
-  cose: {
-    name: 'cose',
-    idealEdgeLength: 120,
-    nodeOverlap: 20,
-    refresh: 20,
-    fit: true,
-    padding: 50,
-    randomize: false,
-    componentSpacing: 120,
-    nodeRepulsion: 450000,
-    edgeElasticity: 100,
-    nestingFactor: 5,
-    gravity: 80,
-    numIter: 1000,
-    initialTemp: 200,
-    coolingFactor: 0.95,
-    minTemp: 1.0
-  },
   breadthfirst: {
     name: 'breadthfirst',
     directed: true,
     fit: true,
-    padding: 30,
-    spacingFactor: 1.2,
-    avoidOverlap: true
-  },
-  concentric: {
-    name: 'concentric',
-    fit: true,
-    padding: 30,
-    startAngle: 3/2 * Math.PI,
-    sweep: undefined,
-    clockwise: true,
-    equidistant: false,
-    minNodeSpacing: 50
+    padding: 50,
+    spacingFactor: 1.5,
+    avoidOverlap: true,
+    animate: true,
+    animationDuration: 500
   },
   grid: {
     name: 'grid',
     fit: true,
-    padding: 30,
+    padding: 40,
     avoidOverlap: true,
-    rows: undefined,
-    columns: undefined
+    rows: 3,
+    columns: 5,
+    animate: true,
+    animationDuration: 500
   },
-  random: {
-    name: 'random',
-    fit: true
-  },
-  circle: {
-    name: 'circle',
+  cose: {
+    name: 'cose',
+    idealEdgeLength: 150,
+    nodeOverlap: 30,
+    refresh: 20,
     fit: true,
-    padding: 30,
-    radius: undefined,
-    startAngle: 3/2 * Math.PI
+    padding: 60,
+    randomize: false,
+    componentSpacing: 150,
+    nodeRepulsion: 500000,
+    edgeElasticity: 120,
+    animate: true,
+    animationDuration: 1000
+  },
+  concentric: {
+    name: 'concentric',
+    fit: true,
+    padding: 50,
+    startAngle: 3/2 * Math.PI,
+    clockwise: true,
+    equidistant: false,
+    minNodeSpacing: 80,
+    animate: true,
+    animationDuration: 800
   }
 };
 
@@ -115,135 +74,56 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
   const cyRef = useRef<any>(null);
   const [nodeDetails, setNodeDetails] = useState<any>(null);
   const [panelPosition, setPanelPosition] = useState({ x: 0, y: 0 });
-  const [currentLayout, setCurrentLayout] = useState<string>('cose');
-  const [expandedNeighborhoods, setExpandedNeighborhoods] = useState<Set<string>>(new Set());
+  const [currentLayout, setCurrentLayout] = useState<string>('breadthfirst');
   const [contextMenuPosition, setContextMenuPosition] = useState<{x: number, y: number} | null>(null);
   const [contextMenuNode, setContextMenuNode] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   
-  // Convert facility data to graph nodes - ensure we're using fresh data
-  const nodes: GraphNode[] = facilityData.map(facility => {
-    console.log('Creating node for facility:', facility.id, facility.name, facility.type);
-    return {
-      data: {
-        id: facility.id,
-        label: facility.name,
-        type: facility.type,
-        details: facility,
-        expanded: expandedNeighborhoods.has(facility.id)
-      }
-    };
+  // Transform Airways.json data using utility function
+  const cytoscapeElements = transformAirwaysDataToCytoscape(facilityData, vehicleMovements);
+  
+  // Apply search filtering
+  const filteredElements = filterCytoscapeElements(cytoscapeElements, searchQuery);
+  
+  console.log('GraphVisualization render:', {
+    totalElements: cytoscapeElements.length,
+    filteredElements: filteredElements.length,
+    searchQuery,
+    currentLayout
   });
 
-  // Convert vehicle movements to graph edges - ensure we're using fresh data
-  const edges: GraphEdge[] = vehicleMovements.map(movement => {
-    console.log('Creating edge for movement:', movement.id, movement.sourceFacilityId, '->', movement.destinationFacilityId);
-    return {
-      data: {
-        id: `edge-${movement.id}`,
-        source: movement.sourceFacilityId,
-        target: movement.destinationFacilityId,
-        label: movement.cargo,
-        status: movement.status
-      }
-    };
-  });
-
-  // Log the current data being used
-  useEffect(() => {
-    console.log('GraphVisualization data update:', {
-      totalFacilities: facilityData.length,
-      totalMovements: vehicleMovements.length,
-      nodesCreated: nodes.length,
-      edgesCreated: edges.length,
-      facilitiesByType: facilityData.reduce((acc, f) => {
-        acc[f.type] = (acc[f.type] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>)
-    });
-  }, [nodes.length, edges.length]);
-
-  // Filter nodes based on search query
-  const filteredNodes = searchQuery
-    ? nodes.filter(node => 
-        node.data.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        node.data.type.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : nodes;
-
-  // Filter edges based on filtered nodes
-  const filteredNodeIds = new Set(filteredNodes.map(node => node.data.id));
-  const filteredEdges = edges.filter(edge => 
-    filteredNodeIds.has(edge.data.source) && filteredNodeIds.has(edge.data.target)
-  );
-
-  console.log('Filtered data:', {
-    filteredNodes: filteredNodes.length,
-    filteredEdges: filteredEdges.length,
-    searchQuery
-  });
-
-  // Enhanced stylesheet with fixed Cytoscape properties
+  // Enhanced stylesheet using transformed data properties
   const stylesheet = [
     {
       selector: 'node',
       style: {
-        'background-color': (ele: any) => getNodeColor(ele.data('type')),
+        'background-color': (ele: any) => ele.data('color'),
         'label': 'data(label)',
         'color': '#ffffff',
         'text-outline-color': '#0b1420',
-        'text-outline-width': 1,
-        'font-size': 11,
+        'text-outline-width': 2,
+        'font-size': 12,
         'text-valign': 'center',
         'text-halign': 'center',
         'text-wrap': 'wrap',
-        'text-max-width': '100px',
-        'width': 80,
-        'height': 80,
-        'border-color': '#ffffff',
-        'border-width': (ele: any) => ele.id() === selectedNode ? 3 : 1,
-        'border-opacity': (ele: any) => ele.id() === selectedNode ? 1 : 0.5,
-        'text-margin-y': 0,
-        'shape': (ele: any) => {
-          switch(ele.data('type')) {
-            case FacilityType.MANUFACTURING: return 'ellipse';
-            case FacilityType.DISTRIBUTION: return 'diamond';
-            case FacilityType.SHOWROOM: return 'round-rectangle';
-            case FacilityType.SUPPLIER: return 'hexagon';
-            case FacilityType.BUYER: return 'pentagon';
-            default: return 'ellipse';
-          }
-        }
+        'text-max-width': '120px',
+        'width': 90,
+        'height': 90,
+        'border-color': (ele: any) => ele.id() === selectedNode ? '#00ffcc' : '#ffffff',
+        'border-width': (ele: any) => ele.id() === selectedNode ? 4 : 2,
+        'border-opacity': 0.8,
+        'shape': (ele: any) => ele.data('shape'),
+        'transition-property': 'border-width, border-color',
+        'transition-duration': '0.3s'
       }
     },
     {
       selector: 'edge',
       style: {
-        'width': 2,
-        'line-color': (ele: any) => {
-          switch (ele.data('status')) {
-            case 'in-transit':
-              return '#00ffcc';
-            case 'completed':
-              return '#9b87f5';
-            case 'scheduled':
-              return '#0ec1eb';
-            default:
-              return '#8E9196';
-          }
-        },
-        'target-arrow-color': (ele: any) => {
-          switch (ele.data('status')) {
-            case 'in-transit':
-              return '#00ffcc';
-            case 'completed':
-              return '#9b87f5';
-            case 'scheduled':
-              return '#0ec1eb';
-            default:
-              return '#8E9196';
-          }
-        },
+        'width': (ele: any) => ele.data('weight') || 2,
+        'line-color': (ele: any) => ele.data('color'),
+        'target-arrow-color': (ele: any) => ele.data('color'),
         'target-arrow-shape': 'triangle',
         'curve-style': 'bezier',
         'label': 'data(label)',
@@ -251,74 +131,83 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
         'color': '#e5deff',
         'text-outline-color': '#0b1420',
         'text-outline-width': 2,
-        'text-background-opacity': 0.7,
+        'text-background-opacity': 0.8,
         'text-background-color': '#0b1420',
-        'text-background-padding': 3,
-        'text-wrap': 'wrap',
-        'text-max-width': '120px',
-        'edge-text-rotation': 'autorotate',
-        'text-rotation': 'none',
-        'arrow-scale': 1.5,
-        'target-distance-from-node': 5,
-        'text-margin-y': -10,
+        'text-background-padding': 4,
+        'arrow-scale': 1.8,
         'source-endpoint': 'outside-to-node',
-        'target-endpoint': 'outside-to-node'
+        'target-endpoint': 'outside-to-node',
+        'transition-property': 'width, line-color',
+        'transition-duration': '0.3s'
       }
     },
     {
-      selector: 'node:selected',
+      selector: 'node:hover',
       style: {
-        'border-color': '#ffffff',
-        'border-width': 3,
+        'border-width': 5,
+        'border-color': '#00ffcc',
         'border-opacity': 1,
-        'background-opacity': 0.9
+        'z-index': 999
+      }
+    },
+    {
+      selector: 'edge:hover',
+      style: {
+        'width': 4,
+        'z-index': 999
       }
     },
     {
       selector: 'node.highlighted',
       style: {
         'border-color': '#00ffcc',
-        'border-width': 3,
+        'border-width': 6,
         'border-opacity': 1,
         'background-opacity': 1,
-        'z-index': 999
-      }
-    },
-    {
-      selector: 'edge.highlighted',
-      style: {
-        'width': 3,
-        'line-color': '#00ffcc',
-        'target-arrow-color': '#00ffcc',
         'z-index': 999
       }
     }
   ];
 
-  // Effect for when selected node changes
+  // Enhanced node selection with details panel positioning
   useEffect(() => {
     if (cyRef.current && selectedNode) {
       const node = cyRef.current.getElementById(selectedNode);
       if (node.length > 0) {
         const position = node.renderedPosition();
-        
         setPanelPosition({
-          x: position.x + 100,
-          y: position.y - 50
+          x: position.x + 120,
+          y: position.y - 60
+        });
+        
+        // Highlight connected edges
+        const connectedEdges = node.connectedEdges();
+        connectedEdges.addClass('highlighted');
+        
+        // Auto-center on selected node
+        cyRef.current.animate({
+          center: { eles: node },
+          zoom: Math.max(zoomLevel, 1.2)
+        }, {
+          duration: 500
         });
       }
     }
-  }, [selectedNode]);
+  }, [selectedNode, zoomLevel]);
 
-  // Apply zoom level
+  // Apply zoom level with smooth animation
   useEffect(() => {
     if (cyRef.current) {
-      cyRef.current.zoom(zoomLevel);
-      cyRef.current.center();
+      cyRef.current.animate({
+        zoom: zoomLevel,
+        center: cyRef.current.center()
+      }, {
+        duration: 300
+      });
     }
   }, [zoomLevel]);
 
-  // Apply layout
+  // Apply layout with enhanced animations
   useEffect(() => {
     if (cyRef.current) {
       // @ts-ignore
@@ -327,16 +216,16 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
       layout.run();
       toast(`Applied ${currentLayout} layout`);
     }
-  }, [currentLayout]);
+  }, [currentLayout, filteredElements.length]);
 
-  // Toggle fullscreen mode
+  // Toggle fullscreen functionality
   const toggleFullscreen = () => {
     const container = document.getElementById('graph-container');
     
     if (!document.fullscreenElement) {
       if (container?.requestFullscreen) {
         container.requestFullscreen().catch(err => {
-          toast.error(`Error attempting to enable fullscreen: ${err.message}`);
+          toast.error(`Error enabling fullscreen: ${err.message}`);
         });
         setIsFullscreen(true);
       }
@@ -348,68 +237,62 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
     }
   };
 
-  // Handle expanding/collapsing neighborhoods
-  const toggleNeighborhood = (nodeId: string) => {
-    if (cyRef.current) {
-      const node = cyRef.current.getElementById(nodeId);
-      const neighbors = node.neighborhood();
-      
-      // Toggle highlight state
-      if (expandedNeighborhoods.has(nodeId)) {
-        // Remove highlighting
-        neighbors.removeClass('highlighted');
-        node.removeClass('highlighted');
-        
-        // Update state
-        const newExpanded = new Set(expandedNeighborhoods);
-        newExpanded.delete(nodeId);
-        setExpandedNeighborhoods(newExpanded);
-      } else {
-        // Add highlighting
-        neighbors.addClass('highlighted');
-        node.addClass('highlighted');
-        
-        // Update state
-        const newExpanded = new Set(expandedNeighborhoods);
-        newExpanded.add(nodeId);
-        setExpandedNeighborhoods(newExpanded);
-      }
-    }
-  };
-
-  // Handle Cytoscape instance creation
+  // Enhanced Cytoscape event handling
   const handleCytoscapeRef = (cy: any) => {
     cyRef.current = cy;
     
-    console.log('Cytoscape instance created with elements:', {
+    console.log('Cytoscape initialized with elements:', {
       nodes: cy.nodes().length,
       edges: cy.edges().length
     });
     
-    // Register node click event
+    // Node click event with enhanced details
     cy.on('tap', 'node', (event: any) => {
       const node = event.target;
-      onNodeSelect(node.id());
+      const nodeId = node.id();
+      onNodeSelect(nodeId);
       setNodeDetails(node.data('details'));
+      
+      // Clear previous highlights
+      cy.elements().removeClass('highlighted');
+      
+      // Highlight clicked node and connections
+      node.addClass('highlighted');
+      node.connectedEdges().addClass('highlighted');
       
       const position = node.renderedPosition();
       setPanelPosition({
-        x: position.x + 100,
-        y: position.y - 50
+        x: position.x + 120,
+        y: position.y - 60
       });
+      
+      toast(`Selected: ${node.data('label')}`);
     });
     
-    // Register background click event
+    // Background click to clear selection
     cy.on('tap', (event: any) => {
       if (event.target === cy) {
         onNodeSelect('');
         setNodeDetails(null);
         setContextMenuPosition(null);
         setContextMenuNode(null);
+        cy.elements().removeClass('highlighted');
       }
     });
 
-    // Register right click for context menu
+    // Enhanced hover effects
+    cy.on('mouseover', 'node', (event: any) => {
+      const node = event.target;
+      setHoveredNode(node.id());
+      document.body.style.cursor = 'pointer';
+    });
+
+    cy.on('mouseout', 'node', (event: any) => {
+      setHoveredNode(null);
+      document.body.style.cursor = 'default';
+    });
+
+    // Right-click context menu
     cy.on('cxttap', 'node', (event: any) => {
       const node = event.target;
       const position = event.renderedPosition;
@@ -422,12 +305,15 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
     });
   };
 
-  // Handle keyboard shortcuts
+  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && contextMenuPosition) {
+      if (event.key === 'Escape') {
         setContextMenuPosition(null);
         setContextMenuNode(null);
+        if (cyRef.current) {
+          cyRef.current.elements().removeClass('highlighted');
+        }
       }
     };
 
@@ -435,11 +321,11 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [contextMenuPosition]);
+  }, []);
 
   return (
     <div id="graph-container" className="w-full h-[calc(100vh-220px)] relative">
-      {/* Layout controls using LayoutController */}
+      {/* Layout controls */}
       <div className="absolute top-2 left-2 z-10">
         <LayoutController 
           currentLayout={currentLayout}
@@ -458,22 +344,23 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
         {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
       </Button>
 
-      {/* Main graph visualization */}
+      {/* Main Cytoscape visualization */}
       <CytoscapeComponent
-        elements={[...filteredNodes, ...filteredEdges]}
+        elements={filteredElements}
         style={{ width: '100%', height: '100%' }}
         stylesheet={stylesheet}
         layout={LAYOUTS[currentLayout]}
         cy={handleCytoscapeRef}
-        minZoom={0.1}
-        maxZoom={3}
+        minZoom={0.2}
+        maxZoom={4}
         boxSelectionEnabled={true}
+        wheelSensitivity={0.3}
       />
 
       {/* Context menu */}
       {contextMenuPosition && contextMenuNode && (
         <div
-          className="absolute z-50 bg-[#0b1420]/95 border border-[#0ec1eb]/30 rounded-md shadow-lg p-2 w-48"
+          className="absolute z-50 bg-[#0b1420]/95 border border-[#0ec1eb]/30 rounded-md shadow-lg p-2 w-52"
           style={{
             left: `${contextMenuPosition.x}px`,
             top: `${contextMenuPosition.y}px`,
@@ -482,18 +369,12 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
           <button
             className="w-full text-left px-3 py-2 text-sm text-[#0ec1eb] hover:bg-[#121a2b] rounded-md"
             onClick={() => {
-              toggleNeighborhood(contextMenuNode);
-              setContextMenuPosition(null);
-            }}
-          >
-            {expandedNeighborhoods.has(contextMenuNode) ? 'Collapse Neighborhood' : 'Expand Neighborhood'}
-          </button>
-          <button
-            className="w-full text-left px-3 py-2 text-sm text-[#0ec1eb] hover:bg-[#121a2b] rounded-md"
-            onClick={() => {
               if (cyRef.current) {
-                cyRef.current.center(cyRef.current.getElementById(contextMenuNode));
-                cyRef.current.zoom(1.5);
+                const node = cyRef.current.getElementById(contextMenuNode);
+                cyRef.current.animate({
+                  center: { eles: node },
+                  zoom: 2
+                }, { duration: 500 });
               }
               setContextMenuPosition(null);
             }}
@@ -510,6 +391,20 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
           >
             Show Details
           </button>
+          <button
+            className="w-full text-left px-3 py-2 text-sm text-[#0ec1eb] hover:bg-[#121a2b] rounded-md"
+            onClick={() => {
+              if (cyRef.current) {
+                const node = cyRef.current.getElementById(contextMenuNode);
+                const neighbors = node.neighborhood();
+                neighbors.addClass('highlighted');
+                node.addClass('highlighted');
+              }
+              setContextMenuPosition(null);
+            }}
+          >
+            Highlight Connections
+          </button>
         </div>
       )}
 
@@ -521,6 +416,9 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
           onClose={() => {
             onNodeSelect('');
             setNodeDetails(null);
+            if (cyRef.current) {
+              cyRef.current.elements().removeClass('highlighted');
+            }
           }}
         />
       )}
