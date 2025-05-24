@@ -35,13 +35,13 @@ interface GraphEdge {
   };
 }
 
-// New, more vibrant color scheme inspired by the image
+// Color scheme for node types
 const getNodeColor = (facilityType: FacilityType): string => {
   switch (facilityType) {
     case FacilityType.MANUFACTURING:
-      return '#F97316'; // Bright orange from image
+      return '#F97316'; // Bright orange
     case FacilityType.DISTRIBUTION:
-      return '#33C3F0'; // Vibrant sky blue from image
+      return '#33C3F0'; // Vibrant sky blue
     case FacilityType.SHOWROOM:
       return '#9b87f5'; // Purple
     case FacilityType.SUPPLIER:
@@ -121,27 +121,47 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
   const [contextMenuNode, setContextMenuNode] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   
-  // Convert facility data to graph nodes
-  const nodes: GraphNode[] = facilityData.map(facility => ({
-    data: {
-      id: facility.id,
-      label: facility.name,
-      type: facility.type,
-      details: facility,
-      expanded: expandedNeighborhoods.has(facility.id)
-    }
-  }));
+  // Convert facility data to graph nodes - ensure we're using fresh data
+  const nodes: GraphNode[] = facilityData.map(facility => {
+    console.log('Creating node for facility:', facility.id, facility.name, facility.type);
+    return {
+      data: {
+        id: facility.id,
+        label: facility.name,
+        type: facility.type,
+        details: facility,
+        expanded: expandedNeighborhoods.has(facility.id)
+      }
+    };
+  });
 
-  // Convert vehicle movements to graph edges
-  const edges: GraphEdge[] = vehicleMovements.map(movement => ({
-    data: {
-      id: `edge-${movement.id}`,
-      source: movement.sourceFacilityId,
-      target: movement.destinationFacilityId,
-      label: movement.cargo,
-      status: movement.status
-    }
-  }));
+  // Convert vehicle movements to graph edges - ensure we're using fresh data
+  const edges: GraphEdge[] = vehicleMovements.map(movement => {
+    console.log('Creating edge for movement:', movement.id, movement.sourceFacilityId, '->', movement.destinationFacilityId);
+    return {
+      data: {
+        id: `edge-${movement.id}`,
+        source: movement.sourceFacilityId,
+        target: movement.destinationFacilityId,
+        label: movement.cargo,
+        status: movement.status
+      }
+    };
+  });
+
+  // Log the current data being used
+  useEffect(() => {
+    console.log('GraphVisualization data update:', {
+      totalFacilities: facilityData.length,
+      totalMovements: vehicleMovements.length,
+      nodesCreated: nodes.length,
+      edgesCreated: edges.length,
+      facilitiesByType: facilityData.reduce((acc, f) => {
+        acc[f.type] = (acc[f.type] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>)
+    });
+  }, [nodes.length, edges.length]);
 
   // Filter nodes based on search query
   const filteredNodes = searchQuery
@@ -157,7 +177,13 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
     filteredNodeIds.has(edge.data.source) && filteredNodeIds.has(edge.data.target)
   );
 
-  // Enhanced stylesheet for better visualization
+  console.log('Filtered data:', {
+    filteredNodes: filteredNodes.length,
+    filteredEdges: filteredEdges.length,
+    searchQuery
+  });
+
+  // Enhanced stylesheet with fixed Cytoscape properties
   const stylesheet = [
     {
       selector: 'node',
@@ -203,7 +229,7 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
             case 'scheduled':
               return '#0ec1eb';
             default:
-              return '#8E9196'; // Light gray color from image
+              return '#8E9196';
           }
         },
         'target-arrow-color': (ele: any) => {
@@ -234,7 +260,6 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
         'text-rotation': 'none',
         'arrow-scale': 1.5,
         'target-distance-from-node': 5,
-        // Position text away from the edge line to avoid intersection
         'text-margin-y': -10,
         'source-endpoint': 'outside-to-node',
         'target-endpoint': 'outside-to-node'
@@ -246,12 +271,7 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
         'border-color': '#ffffff',
         'border-width': 3,
         'border-opacity': 1,
-        'background-opacity': 0.9,
-        'shadow-blur': 10,
-        'shadow-color': '#ffffff',
-        'shadow-opacity': 0.5,
-        'shadow-offset-x': 0,
-        'shadow-offset-y': 0
+        'background-opacity': 0.9
       }
     },
     {
@@ -261,11 +281,6 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
         'border-width': 3,
         'border-opacity': 1,
         'background-opacity': 1,
-        'shadow-blur': 15,
-        'shadow-color': '#00ffcc',
-        'shadow-opacity': 0.6,
-        'shadow-offset-x': 0,
-        'shadow-offset-y': 0,
         'z-index': 999
       }
     },
@@ -275,11 +290,6 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
         'width': 3,
         'line-color': '#00ffcc',
         'target-arrow-color': '#00ffcc',
-        'shadow-blur': 10,
-        'shadow-color': '#00ffcc',
-        'shadow-opacity': 0.5,
-        'shadow-offset-x': 0,
-        'shadow-offset-y': 0,
         'z-index': 999
       }
     }
@@ -370,6 +380,11 @@ const GraphVisualization = ({ searchQuery, selectedNode, onNodeSelect, zoomLevel
   // Handle Cytoscape instance creation
   const handleCytoscapeRef = (cy: any) => {
     cyRef.current = cy;
+    
+    console.log('Cytoscape instance created with elements:', {
+      nodes: cy.nodes().length,
+      edges: cy.edges().length
+    });
     
     // Register node click event
     cy.on('tap', 'node', (event: any) => {
